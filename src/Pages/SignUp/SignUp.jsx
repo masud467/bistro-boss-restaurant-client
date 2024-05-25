@@ -5,35 +5,45 @@ import { Helmet } from "react-helmet-async";
 import { useContext } from "react";
 import { AuthContext } from "../../Providers/AuthProvider";
 import Swal from "sweetalert2";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import SocialLogIn from "../../Components/SocialLogIn/SocialLogIn";
 
 const SignUp = () => {
-    const {createUser,userProfileUpdate} =useContext(AuthContext)
-    const navigate = useNavigate()
+  const { createUser, userProfileUpdate } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const axiosPublic = useAxiosPublic();
   const {
     register,
     handleSubmit,
-
+    reset,
     formState: { errors },
   } = useForm();
 
   const onSubmit = (data) => {
     console.log(data);
-    createUser(data.email,data.password)
-    .then(result=>{
-        const loggedUser = result.user
-        console.log(loggedUser)
-        userProfileUpdate(data.name,data.photoURL)
-        .then(()=>{
-            console.log('user profile updated')
-            Swal.fire({
+    createUser(data.email, data.password).then((result) => {
+      const loggedUser = result.user;
+      console.log(loggedUser);
+      userProfileUpdate(data.name, data.photoURL)
+        .then(() => {
+          const userInfo = {
+            name: data.name,
+            email: data.email,
+          };
+          axiosPublic.post("/users", userInfo).then((res) => {
+            if (res.data.insertedId) {
+              reset();
+              Swal.fire({
                 title: "Good job!",
                 text: "User created Successfully!",
-                icon: "success"
+                icon: "success",
               });
-              navigate('/')
+              navigate('/');
+            }
+          });
         })
-        .catch(error=>console.log(error))
-    })
+        .catch((error) => console.log(error));
+    });
   };
 
   //   console.log(watch("example"));
@@ -60,7 +70,6 @@ const SignUp = () => {
                   name="name"
                   placeholder="name"
                   className="input input-bordered"
-                
                 />
                 {errors.name && (
                   <span className="text-red-600">Name is required</span>
@@ -72,11 +81,9 @@ const SignUp = () => {
                 </label>
                 <input
                   type="text"
-                  {...register("photoURL", { required: true})}
-                  
+                  {...register("photoURL", { required: true })}
                   placeholder="Photo URL"
                   className="input input-bordered"
-                 
                 />
                 {errors.photoURL && (
                   <span className="text-red-600">Photo URL is required</span>
@@ -92,7 +99,6 @@ const SignUp = () => {
                   name="email"
                   placeholder="email"
                   className="input input-bordered"
-                
                 />
                 {errors.email && (
                   <span className="text-red-600">Email is required</span>
@@ -113,7 +119,6 @@ const SignUp = () => {
                   name="password"
                   placeholder="password"
                   className="input input-bordered"
-                  
                 />
                 {errors.password?.type === "required" && (
                   <p className="text-red-600">Password is required</p>
@@ -149,6 +154,7 @@ const SignUp = () => {
                 </Link>
               </small>
             </p>
+            <SocialLogIn></SocialLogIn>
           </div>
         </div>
       </div>
