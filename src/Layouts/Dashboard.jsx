@@ -71,9 +71,9 @@ const Dashboard = () => {
                     Add Review</NavLink>
             </li>
             <li>
-                <NavLink to='/dashboard/booking'>
+                <NavLink to='/dashboard/payment-history'>
                 <FaShoppingCart></FaShoppingCart>
-                    My Booking</NavLink>
+                    Real Payment History</NavLink>
             </li>
             </>
            }
